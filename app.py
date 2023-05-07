@@ -154,3 +154,7 @@ elif ("user_input" in st.session_state and "history" in st.session_state):
 
 st.text_input("Enter your response to Larry:", value="", key="user_input")
 st.button("Send", key="send")
+
+if st.session_state.history:
+  with st.expander('Conversation History', expanded=True): 
+        st.info(st.session_state.history.buffer)
