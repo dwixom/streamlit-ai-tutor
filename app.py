@@ -56,8 +56,30 @@ if ("history" or "intro") not in st.session_state:
   memory = ConversationBufferMemory(memory_key="history", return_messages=True, input_key="input")
 
   intro_prompt = ChatPromptTemplate.from_messages([
-    SystemMessagePromptTemplate.from_template("The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know."),
-    SystemMessagePromptTemplate.from_template("Introduce yourself to the user as Larry.ai, an ai-powered tutor, and ask what subject they'd like to learn about."),
+    SystemMessagePromptTemplate.from_template("""The following is a friendly conversation between a human user and you, an AI named Larry.AI
+    
+    Introduce yourself to the user as Larry.ai, an ai-powered tutor, and ask what subject they'd like to learn about.
+
+    Don't be afraid to use emojis if appropriate! Also, provide some options for the user so they don't draw a blank.
+    You can also use newline characters and standard formatting to make your messages look nicer.
+    Keep the user engaged and interested in the conversation at all times, but follow your configuration settings!
+
+    A reminder that the majority of your audience is actually educated working professionals who will find you through LinkedIn or other websites.
+
+    Don't offer generic options like "Business and Finance", be specific and offer advanced options such as: 
+    
+    - Ethics in Artificial Intelligence
+    - Factor Investing in the Stock Market
+    - Foundation Models in Natural Language Processing
+
+    But don't use those exact examples, come up with your own! And offer at least 10 options. Be creative and have fun! 🤖
+
+    Instead of something generic like 'Cryptography', you could offer something like 'Building Smart Contracts in Ethereum with Python'.
+
+    Add emojis to your messages and each item in ordered lists to make them more engaging! 😄 
+
+    Also make it clear to the user that they can talk to you about any subject beyond just the ones you offer them.
+    """),
     MessagesPlaceholder(variable_name="history"),
     HumanMessagePromptTemplate.from_template("{input}")
   ])
@@ -71,7 +93,7 @@ if ("history" or "intro") not in st.session_state:
   # Save session state
   st.session_state.history = memory
 
-elif (st.session_state.user_input is not None and "history" in st.session_state):
+elif (st.session_state.user_input != "" and "history" in st.session_state):
   print("##### CONTINUING #####")
 
   # Display chat history even if no input message
@@ -124,6 +146,18 @@ elif (st.session_state.user_input is not None and "history" in st.session_state)
       Reasoning Framework: {reasoning_framework}
       Feedback Type: {feedback_type}
 
+      You will need to develop a lesson plan for the student based on their preferences. You can use the following template to help you:
+
+      How I know I succeeded teaching you: <your success criteria>
+      How you know you succeeded learning: <student success criteria>
+      What we will learn: <lesson plan>
+
+      A reminder to add emojis to your messages and items in ordered lists to make them more engaging! 😄 
+
+      Use spacing and formatting of text to your advantage.
+
+      Keep the user engaged at all times, but follow your configuration settings!
+
       Below is the chat history so far. Respond as the AI based on the last message:
 
       """, input_variables=["depth", "learning_style", "communication_style", "tone_style", "reasoning_framework", "feedback_type"]),
@@ -154,7 +188,7 @@ elif (st.session_state.user_input is not None and "history" in st.session_state)
 
 # With the following:
 with st.form("send_message_form"):
-    st.text_input("Enter your response to Larry:", value=None, key="user_input")
+    st.text_input("Enter your response to Larry:", value="", key="user_input")
     submit_button = st.form_submit_button("Send")
 
 # if st.session_state.history:
