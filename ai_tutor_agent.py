@@ -355,14 +355,22 @@ config = dict(
     use_emojis = True,
 )
 
+def get_user_input(user_input_raw):
+    if user_input_raw:
+
+        return user_input_raw
+    else:
+        return "Hello Larry!"
+
 # Streamlit app UI
 st.title("AI Tutor")
-user_input = st.text_input("Respond to Larry:")
 
-# if user_input:
-#     response = agent_executor.run(user_input)
-#     print(f"Response: {response}")  # Add this line to print the response object
-#     st.write(response)
+# Human input and response
+def submit_human_input():
+    st.session_state.human_response = st.session_state.user_input
+    st.session_state.user_input = ''
+
+st.text_input("Respond to Larry:", key="user_input", on_change=submit_human_input)
 
 st.sidebar.header("Customization")
 # depth = st.sidebar.slider("Depth", 1, 10, config["ai_tutor"]["student preferences"]["depth"])
@@ -395,7 +403,8 @@ if 'SETUP' not in st.session_state:
 else:
     print("########## Updating Larry ##########")
     agent = st.session_state.AGENT
-    agent.human_step(user_input)
+    human_response = st.session_state.human_response
+    agent.human_step(human_response)
     agent.determine_conversation_stage()
     response = agent.step()
 
