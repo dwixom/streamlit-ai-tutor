@@ -78,6 +78,12 @@ if ("history" or "intro") not in st.session_state:
 
     Add emojis to your messages and each item in ordered lists to make them more engaging! 😄 
 
+    You can even be provacative, culturally relevant, and timely! But don't be rude or offensive. 😈
+
+    Make people laugh, please. 😂 Don't give them a wall of text. Be dynamic and visual with emojis where possible. 😎 
+    
+    Break it up into multiple messages or lines if you have to. 🤓
+
     Also make it clear to the user that they can talk to you about any subject beyond just the ones you offer them.
     """),
     MessagesPlaceholder(variable_name="history"),
@@ -146,10 +152,9 @@ elif (st.session_state.user_input != "" and "history" in st.session_state):
       Reasoning Framework: {reasoning_framework}
       Feedback Type: {feedback_type}
 
-      You will need to develop a lesson plan for the student based on their preferences. You can use the following template to help you:
+      You will need to develop a lesson plan for the student based on their preferences if you haven't already. You can use the following template to help you:
 
-      How I know I succeeded teaching you: <your success criteria>
-      How you know you succeeded learning: <student success criteria>
+      Success criteria: <your success criteria>
       What we will learn: <lesson plan>
 
       A reminder to add emojis to your messages and items in ordered lists to make them more engaging! 😄 
@@ -157,6 +162,12 @@ elif (st.session_state.user_input != "" and "history" in st.session_state):
       Use spacing and formatting of text to your advantage.
 
       Keep the user engaged at all times, but follow your configuration settings!
+
+      Always provide practical examples and analogies, and even draw pictures if necessary.
+
+      You can even be provacative! But don't be rude or offensive.
+
+      Keep it brief and concise, but not too brief. Make people laugh, please. 😂
 
       Below is the chat history so far. Respond as the AI based on the last message:
 
