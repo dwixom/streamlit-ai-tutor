@@ -41,6 +41,60 @@ DEPTH_LEVELS = {
     "10": "Cutting-edge research -- Discusses recent research and discoveries, offering deep understanding of current developments and future directions."
 }
 
+# Learning Styles
+LEARNING_STYLES = {
+    "1": "Sensing -- Concrete, practical, oriented towards facts and procedures.",
+    "2": "Visual -- Prefer visual representations of presented material - pictures, diagrams, flow charts",
+    "3": "Inductive -- Prefer presentations that proceed from the specific to the general",
+    "4": "Active -- Learn by trying things out, experimenting, and doing",
+    "5": "Sequential -- Linear, orderly learn in small incremental steps",
+    "6": "Intuitive -- Conceptual, innovative, oriented toward theories and meanings",
+    "7": "Verbal -- Prefer written and spoken explanations",
+    "8": "Deductive -- Prefer presentations that go from the general to the specific",
+    "9": "Reflective -- Learn by thinking things through, working alone",
+    "10": "Global -- Holistic, system thinkers, learn in large leaps"
+}
+
+# Communication Styles
+COMMUNICATION_STYLES = {
+    "1": "Stochastic -- Incorporates randomness or variability, generating slight variations in responses for a dynamic, less repetitive conversation.",
+    "2": "Formal -- Follows strict grammatical rules and avoids contractions, slang, or colloquialisms for a structured and polished presentation.",
+    "3": "Textbook -- Resembles language in textbooks, using well-structured sentences, rich vocabulary, and focusing on clarity and coherence.",
+    "4": "Layman -- Simplifies complex concepts, using everyday language and relatable examples for accessible and engaging explanations.",
+    "5": "Story Telling -- Presents information through narratives or anecdotes, making ideas engaging and memorable with relatable stories.",
+    "6": "Socratic -- Asks thought-provoking questions to stimulate intellectual curiosity, critical thinking, and self-directed learning.",
+    "7": "Humorous -- Incorporates wit, jokes, and light-hearted elements for enjoyable, engaging, and memorable content in a relaxed atmosphere."
+}
+
+# Tone Styles
+TONE_STYLES = {
+    "1": "Debate -- Assertive and competitive, challenges users to think critically and defend their position. Suitable for confident learners.",
+    "2": "Encouraging -- Supportive and empathetic, provides positive reinforcement. Ideal for sensitive learners preferring collaboration.",
+    "3": "Neutral -- Objective and impartial, avoids taking sides or expressing strong opinions. Fits reserved learners valuing neutrality.",
+    "4": "Informative -- Clear and precise, focuses on facts and avoids emotional language. Ideal for analytical learners seeking objectivity.",
+    "5": "Friendly -- Warm and conversational, establishes connection using friendly language. Best for extroverted learners preferring personal interactions."
+}
+
+# Reasoning Frameworks
+REASONING_FRAMEWORKS = {
+    "1": "Deductive -- Draws conclusions from general principles, promoting critical thinking and logical problem-solving skills.",
+    "2": "Inductive -- Forms general conclusions from specific observations, encouraging pattern recognition and broader theories.",
+    "3": "Abductive -- Generates likely explanations based on limited information, supporting plausible hypothesis formation.",
+    "4": "Analogical -- Compares similarities between situations or concepts, fostering deep understanding and creative problem-solving.",
+    "5": "Causal -- Identifies cause-and-effect relationships, developing critical thinking and understanding of complex systems."
+}
+
+# Feedback Types
+FEEDBACK_TYPES = {
+    "1": "Immediate -- Provides instant feedback after each response or interaction, allowing for quick corrections and reinforcement.",
+    "2": "Delayed -- Delays feedback to encourage reflection and self-assessment before revealing the correct answer or guidance.",
+    "3": "Summary -- Offers feedback as a summary after a series of questions or interactions, providing a comprehensive overview of performance.",
+    "4": "Adaptive -- Adjusts feedback based on user performance, providing more guidance and support when needed, and less when the user demonstrates understanding.",
+    "5": "Minimal -- Offers limited feedback, encouraging learners to seek answers and guidance independently and fostering self-reliance.",
+    "6": "Constructive -- Provides feedback that focuses on specific areas for improvement, offering suggestions and guidance on how to address weaknesses.",
+    "7": "Positive -- Emphasizes positive aspects of the learner's performance, providing motivation and encouragement to continue learning."
+}
+
 # an empty string
 CONVERSATION_STAGES_STR = str()
 
@@ -127,6 +181,7 @@ class AgentConversationChain(LLMChain):
 
         Self-Reminder that the students preferences are the following:
         
+        Emojis Allowed: {use_emojis}
         Depth: {depth}
         Learning Style: {learning_style}
         Communication Style: {communication_style}
@@ -162,7 +217,8 @@ class AgentConversationChain(LLMChain):
                 "communication_style",
                 "tone_style",
                 "reasoning_framework",
-                "feedback_type"
+                "feedback_type",
+                "use_emojis",
             ],
         )
         return cls(prompt=prompt, llm=llm, verbose=verbose)
@@ -190,6 +246,7 @@ class AgentGPT(Chain, BaseModel):
     tone_style: str = "1"
     reasoning_framework: str = "1"
     feedback_type: str = "1"
+    use_emojis: bool = True
 
     def retrieve_conversation_stage(self, key):
         return self.conversation_stage_dict.get(key, '1')
@@ -243,7 +300,8 @@ class AgentGPT(Chain, BaseModel):
             communication_style = self.communication_style,
             tone_style = self.tone_style,
             reasoning_framework = self.reasoning_framework,
-            feedback_type = self.feedback_type
+            feedback_type = self.feedback_type,
+            use_emojis = self.use_emojis,
         )
         
         # Add agent's response to conversation history
@@ -276,7 +334,6 @@ config = dict(
     agent_name = "Larry",
     agent_role= "AI-powered Tutor",
     agent_rules = "\n".join(AGENT_RULES),
-    use_emojis = True,
     company_name="Tutor.ai",
     company_business="Tutor.ai is a premier tutoring company that provides students with the most effective and personalized learning experience possible. We offer a range of high-quality tutoring services that are designed to meet the unique needs of our students.",
     company_values = "Our mission at Tutor.ai is to help students achieve their academic goals by providing them with the best possible learning solutions. We believe that quality education is essential to success, and we are committed to helping our students achieve their academic goals by offering exceptional tutoring services and customer service.",
@@ -285,11 +342,12 @@ config = dict(
     conversation_type="message",
     conversation_stage = CONVERSATION_STAGES.get('1'),
     depth = DEPTH_LEVELS.get('1'),
-    learning_style = "1",
-    communication_style = "1",
-    tone_style = "1",
-    reasoning_framework = "1",
-    feedback_type = "1"
+    learning_style = LEARNING_STYLES.get("1"),
+    communication_style = COMMUNICATION_STYLES.get("1"),
+    tone_style = TONE_STYLES.get("1"),
+    reasoning_framework = REASONING_FRAMEWORKS.get("1"),
+    feedback_type = FEEDBACK_TYPES.get("1"),
+    use_emojis = True,
 )
 
 # Setup llm
