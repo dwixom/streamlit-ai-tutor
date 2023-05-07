@@ -367,8 +367,10 @@ st.title("AI Tutor")
 
 # Human input and response
 def submit_human_input():
-    st.session_state.human_response = st.session_state.user_input
-    st.session_state.user_input = ''
+    return none
+    if st.session_state.user_input:
+        st.session_state.human_response = st.session_state.user_input
+        st.session_state.user_input = ''
 
 st.text_input("Respond to Larry:", key="user_input", on_change=submit_human_input)
 
@@ -380,12 +382,10 @@ st.sidebar.header("Customization")
 # reasoning_framework = st.sidebar.multiselect("Reasoning Framework", options=list(config["ai_tutor"]["features"]["personalization"]["reasoning_frameworks"].keys()), default=config["ai_tutor"]["student preferences"]["reasoning_framework"])
 # feedback_type = st.sidebar.multiselect("Feedback Type", options=["Positive", "Constructive", "Mixed"], default=config["ai_tutor"]["student preferences"]["feedback_type"])
 
-
 # Define Session States
 if 'SETUP' not in st.session_state:
     # Initial session state setup
     print("########## Setting Up Larry ##########")
-    st.session_state.SETUP = True
 
     # Setup llm
     llm = ChatOpenAI(temperature=0.9)
@@ -400,16 +400,20 @@ if 'SETUP' not in st.session_state:
     # Save agent and response/intro to session state
     st.session_state.AGENT = agent
     st.session_state.LAST_RESPONSE = response
+    st.session_state.SETUP = True
 else:
     print("########## Updating Larry ##########")
     agent = st.session_state.AGENT
     human_response = st.session_state.human_response
-    agent.human_step(human_response)
-    agent.determine_conversation_stage()
-    response = agent.step()
+    if human_response:
+        agent.human_step(human_response)
+        agent.determine_conversation_stage()
+        response = agent.step()
 
-    # Save agent response to session state
-    st.session_state.LAST_RESPONSE = response
+        # Save agent response to session state
+        st.session_state.LAST_RESPONSE = response
+    else:
+        print("########## No human response ##########")
     
 if 'LAST_RESPONSE' in st.session_state:
     st.markdown(st.session_state.LAST_RESPONSE, unsafe_allow_html=True)
