@@ -117,22 +117,49 @@ elif ("user_input" in st.session_state and "history" in st.session_state):
   if human_msg:
     # st.write(human_msg)
 
+    # Display human message
+    message(human_msg, is_user=True)
+
+    # Build response
     response_prompt = ChatPromptTemplate.from_messages([
       SystemMessagePromptTemplate.from_template("The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know."),
-      # SystemMessagePromptTemplate.from_template("Introduce yourself to the user as Larry.ai, an ai-powered tutor, and ask what subject they'd like to learn about."),
+      SystemMessagePromptTemplate.from_template("""Self-Reminder that the students preferences are the following:
+        
+        Depth: {depth}
+        Learning Style: {learning_style}
+        Communication Style: {communication_style}
+        Tone Style: {tone_style}
+        Reasoning Framework: {reasoning_framework}
+        Feedback Type: {feedback_type}"""),
       MessagesPlaceholder(variable_name="history"),
       HumanMessagePromptTemplate.from_template("{input}")
     ])
+    conversation = LLMChain(memory=memory, prompt=response_prompt, llm=chat, verbose=True)
+    ai_response_raw = conversation.generate([{
+      "history": memory.buffer,
+      "input": human_msg,
+      "depth": st.session_state.depth,
+      "learning_style": st.session_state.learning_style,
+      "communication_style": st.session_state.communication_style,
+      "tone_style": st.session_state.tone_style,
+      "reasoning_framework": st.session_state.reasoning_framework,
+      "feedback_type": st.session_state.feedback_type
+    }])
 
-    conversation = ConversationChain(memory=memory, prompt=response_prompt, llm=chat)
-    ai_response = conversation.predict(input=human_msg)
+    ai_response = ai_response_raw.generations[0][0].message.content
 
-    message(human_msg, is_user=True)
+    # Display response
     message(ai_response)
 
+    # Update memory
+    memory.save_context({"input": human_msg}, {"ouput": ai_response})
+
     # Save session state
-    st.session_state.history = memory
+    # st.session_state.history = memory
     st.session_state.conversation = conversation
+  # else:
+     # No human message
+  
 
 st.text_input("Enter your response to Larry:", key="user_input")
 
