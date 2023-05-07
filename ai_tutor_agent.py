@@ -12,6 +12,7 @@ from langchain.chains.base import Chain
 from langchain.chat_models import ChatOpenAI
 
 # Define Global Variables
+
 # Conversation stages - can be modified
 CONVERSATION_STAGES = {
     '1' : "Introduction: As an AI tutor, you must greet the student and present their current configuration/preferences. Then, await further instructions from the student. Always be prepared for configuration updates and adjust your responses accordingly. If the student has invalid or empty configuration, you must prompt them through the configuration process and then output their configuration. Please output if emojis are enabled.",
@@ -24,6 +25,20 @@ CONVERSATION_STAGES = {
     '8' : "stop: You must stop the lesson plan.",
     '9' : "continue: This means that your output was cut. Please continue where you left off.",
     '10' : "self-eval: You self-evaluate yourself using the self-evaluation format."
+}
+
+# Depths
+DEPTH_LEVELS = {
+    '1': 'Surface level: Covers topic basics with simple definitions and brief explanations, suitable for beginners or quick overviews.',
+    '2': 'Expanded understanding: Elaborates basic concepts, introduces foundational principles, and explores connections for broader understanding.',
+    '3': 'Detailed analysis: Provides in-depth explanations, examples, and context, discussing components, interrelationships, and relevant theories.',
+    "4": "Practical application: Focuses on real-world applications, case studies, and problem-solving techniques for effective knowledge application.",
+    "5": "Advanced concepts: Introduces advanced techniques and tools, covering cutting-edge developments, innovations, and research.",
+    "6": "Critical evaluation: Encourages critical thinking, questioning assumptions, and analyzing arguments to form independent opinions.",
+    "7": "Synthesis and integration: Synthesizes knowledge from various sources, connecting topics and themes for comprehensive understanding.",
+    "8": "Expert insight: Provides expert insight into nuances, complexities, and challenges, discussing trends, debates, and controversies.",
+    "9": "Specialization: Focuses on specific subfields, delving into specialized knowledge and fostering expertise in chosen areas.",
+    "10": "Cutting-edge research: Discusses recent research and discoveries, offering deep understanding of current developments and future directions."
 }
 
 # an empty string
@@ -108,6 +123,10 @@ class AgentConversationChain(LLMChain):
         {agent_name}:
         End of example.
 
+        This is what you output before responding to the student, this is so you remind yourself of the student's preferences and the conversation stage you are at.
+
+        Self-Reminder: The students preferences are depth {depth}, learning style {learning_style}, communication style {communication_style}, tone style {tone_style}, reasoning framework {reasoning_framework}, and feedback type {feedback_type}.
+
         Current conversation stage: 
         {conversation_stage}
         Current conversation history: 
@@ -127,7 +146,13 @@ class AgentConversationChain(LLMChain):
                 "conversation_purpose",
                 "conversation_type",
                 "conversation_stage",
-                "conversation_history"
+                "conversation_history",
+                "depth",
+                "learning_style",
+                "communication_style",
+                "tone_style",
+                "reasoning_framework",
+                "feedback_type"
             ],
         )
         return cls(prompt=prompt, llm=llm, verbose=verbose)
@@ -149,6 +174,12 @@ class AgentGPT(Chain, BaseModel):
     company_values: str = "Our mission at Sleep Haven is to help people achieve a better night's sleep by providing them with the best possible sleep solutions. We believe that quality sleep is essential to overall health and well-being, and we are committed to helping our customers achieve optimal sleep by offering exceptional products and customer service."
     conversation_purpose: str = "find out whether they are looking to achieve better sleep via buying a premier mattress."
     conversation_type: str = "call"
+    depth: str = "1"
+    learning_style: str = "1"
+    communication_style: str = "1"
+    tone_style: str = "1"
+    reasoning_framework: str = "1"
+    feedback_type: str = "1"
 
     def retrieve_conversation_stage(self, key):
         return self.conversation_stage_dict.get(key, '1')
@@ -196,7 +227,13 @@ class AgentGPT(Chain, BaseModel):
             conversation_purpose = self.conversation_purpose,
             conversation_history="\n".join(self.conversation_history),
             conversation_stage = self.current_conversation_stage,
-            conversation_type=self.conversation_type
+            conversation_type=self.conversation_type,
+            depth = self.depth,
+            learning_style = self.learning_style,
+            communication_style = self.communication_style,
+            tone_style = self.tone_style,
+            reasoning_framework = self.reasoning_framework,
+            feedback_type = self.feedback_type
         )
         
         # Add agent's response to conversation history
@@ -238,7 +275,13 @@ config = dict(
     conversation_purpose = "teach the student about whatever topic they are interested in learning about.",
     conversation_history=[''],
     conversation_type="message",
-    conversation_stage = CONVERSATION_STAGES.get('1')
+    conversation_stage = CONVERSATION_STAGES.get('1'),
+    depth = DEPTH_LEVELS.get('1'),
+    learning_style = "1",
+    communication_style = "1",
+    tone_style = "1",
+    reasoning_framework = "1",
+    feedback_type = "1"
 )
 
 # Setup llm
