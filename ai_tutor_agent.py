@@ -1,5 +1,6 @@
 import os
-from apikey import apikey 
+from apikey import apikey
+import streamlit as st
 
 os.environ['OPENAI_API_KEY'] = apikey
 
@@ -231,6 +232,7 @@ class AgentGPT(Chain, BaseModel):
     stage_analyzer_chain: StageAnalyzerChain = Field(...)
     agent_conversation_utterance_chain: AgentConversationChain = Field(...)
     conversation_stage_dict: Dict = CONVERSATION_STAGES
+    last_response: str = ""
 
     agent_name: str = "Ted Lasso"
     agent_role: str = "Business Development Representative"
@@ -279,6 +281,7 @@ class AgentGPT(Chain, BaseModel):
 
     def step(self):
         self._call(inputs={})
+        return self.last_response
 
     def _call(self, inputs: Dict[str, Any]) -> None:
         """Run one step of the agent."""
@@ -307,8 +310,10 @@ class AgentGPT(Chain, BaseModel):
         # Add agent's response to conversation history
         self.conversation_history.append(ai_message)
 
-        print(f'{self.agent_name}: ', ai_message.rstrip('<END_OF_TURN>'))
-        return {}
+        # Clean message for print and save
+        self.last_response = ai_message.rstrip('<END_OF_TURN>')
+
+        print(f'{self.agent_name}: ', self.last_response)
 
     @classmethod
     def from_llm(
@@ -350,15 +355,52 @@ config = dict(
     use_emojis = True,
 )
 
-# Setup llm
-llm = ChatOpenAI(temperature=0.9)
-isVerbose=True
+# Streamlit app UI
+st.title("AI Tutor")
+user_input = st.text_input("Respond to Larry:")
 
-agent = AgentGPT.from_llm(llm, verbose=isVerbose, **config)
-# init agent
-agent.seed_agent()
-agent.determine_conversation_stage()
-agent.step()
-# agent.human_step("Yea sure. I'm interested in learning about quantitative finance.")
-# agent.determine_conversation_stage()
-# agent.step()
+# if user_input:
+#     response = agent_executor.run(user_input)
+#     print(f"Response: {response}")  # Add this line to print the response object
+#     st.write(response)
+
+st.sidebar.header("Customization")
+# depth = st.sidebar.slider("Depth", 1, 10, config["ai_tutor"]["student preferences"]["depth"])
+# learning_style = st.sidebar.multiselect("Learning Style", options=list(config["ai_tutor"]["features"]["personalization"]["learning_styles"].keys()), default=config["ai_tutor"]["student preferences"]["learning_style"])
+# communication_style = st.sidebar.multiselect("Communication Style", options=list(config["ai_tutor"]["features"]["personalization"]["communication_styles"].keys()), default=config["ai_tutor"]["student preferences"]["communication_style"])
+# tone_style = st.sidebar.multiselect("Tone Style", options=list(config["ai_tutor"]["features"]["personalization"]["tone_styles"].keys()), default=config["ai_tutor"]["student preferences"]["tone_style"])
+# reasoning_framework = st.sidebar.multiselect("Reasoning Framework", options=list(config["ai_tutor"]["features"]["personalization"]["reasoning_frameworks"].keys()), default=config["ai_tutor"]["student preferences"]["reasoning_framework"])
+# feedback_type = st.sidebar.multiselect("Feedback Type", options=["Positive", "Constructive", "Mixed"], default=config["ai_tutor"]["student preferences"]["feedback_type"])
+
+
+# Define Session States
+if 'SETUP' not in st.session_state:
+    # Initial session state setup
+    print("########## Setting Up Larry ##########")
+    st.session_state.SETUP = True
+
+    # Setup llm
+    llm = ChatOpenAI(temperature=0.9)
+    isVerbose=True
+    agent = AgentGPT.from_llm(llm, verbose=isVerbose, **config)
+
+    # Init agent
+    agent.seed_agent()
+    agent.determine_conversation_stage()
+    response = agent.step()
+
+    # Save agent and response/intro to session state
+    st.session_state.AGENT = agent
+    st.session_state.LAST_RESPONSE = response
+else:
+    print("########## Updating Larry ##########")
+    agent = st.session_state.AGENT
+    agent.human_step(user_input)
+    agent.determine_conversation_stage()
+    response = agent.step()
+
+    # Save agent response to session state
+    st.session_state.LAST_RESPONSE = response
+    
+if 'LAST_RESPONSE' in st.session_state:
+    st.markdown(st.session_state.LAST_RESPONSE, unsafe_allow_html=True)
