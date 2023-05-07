@@ -29,16 +29,16 @@ CONVERSATION_STAGES = {
 
 # Depths
 DEPTH_LEVELS = {
-    '1': 'Surface level: Covers topic basics with simple definitions and brief explanations, suitable for beginners or quick overviews.',
-    '2': 'Expanded understanding: Elaborates basic concepts, introduces foundational principles, and explores connections for broader understanding.',
-    '3': 'Detailed analysis: Provides in-depth explanations, examples, and context, discussing components, interrelationships, and relevant theories.',
-    "4": "Practical application: Focuses on real-world applications, case studies, and problem-solving techniques for effective knowledge application.",
-    "5": "Advanced concepts: Introduces advanced techniques and tools, covering cutting-edge developments, innovations, and research.",
-    "6": "Critical evaluation: Encourages critical thinking, questioning assumptions, and analyzing arguments to form independent opinions.",
-    "7": "Synthesis and integration: Synthesizes knowledge from various sources, connecting topics and themes for comprehensive understanding.",
-    "8": "Expert insight: Provides expert insight into nuances, complexities, and challenges, discussing trends, debates, and controversies.",
-    "9": "Specialization: Focuses on specific subfields, delving into specialized knowledge and fostering expertise in chosen areas.",
-    "10": "Cutting-edge research: Discusses recent research and discoveries, offering deep understanding of current developments and future directions."
+    '1': 'Surface level -- Covers topic basics with simple definitions and brief explanations, suitable for beginners or quick overviews.',
+    '2': 'Expanded understanding -- Elaborates basic concepts, introduces foundational principles, and explores connections for broader understanding.',
+    '3': 'Detailed analysis -- Provides in-depth explanations, examples, and context, discussing components, interrelationships, and relevant theories.',
+    "4": "Practical application -- Focuses on real-world applications, case studies, and problem-solving techniques for effective knowledge application.",
+    "5": "Advanced concepts -- Introduces advanced techniques and tools, covering cutting-edge developments, innovations, and research.",
+    "6": "Critical evaluation -- Encourages critical thinking, questioning assumptions, and analyzing arguments to form independent opinions.",
+    "7": "Synthesis and integration -- Synthesizes knowledge from various sources, connecting topics and themes for comprehensive understanding.",
+    "8": "Expert insight -- Provides expert insight into nuances, complexities, and challenges, discussing trends, debates, and controversies.",
+    "9": "Specialization -- Focuses on specific subfields, delving into specialized knowledge and fostering expertise in chosen areas.",
+    "10": "Cutting-edge research -- Discusses recent research and discoveries, offering deep understanding of current developments and future directions."
 }
 
 # an empty string
@@ -125,10 +125,20 @@ class AgentConversationChain(LLMChain):
 
         This is what you output before responding to the student, this is so you remind yourself of the student's preferences and the conversation stage you are at.
 
-        Self-Reminder: The students preferences are depth {depth}, learning style {learning_style}, communication style {communication_style}, tone style {tone_style}, reasoning framework {reasoning_framework}, and feedback type {feedback_type}.
+        Self-Reminder that the students preferences are the following:
+        
+        Depth: {depth}
+        Learning Style: {learning_style}
+        Communication Style: {communication_style}
+        Tone Style: {tone_style}
+        Reasoning Framework: {reasoning_framework}
+        Feedback Type: {feedback_type}
+
+        Generate a response to the student based on the conversation history and the student's preferences, as well as the conversation stage you are at.
 
         Current conversation stage: 
         {conversation_stage}
+
         Current conversation history: 
         {conversation_history}
         {agent_name}: 
@@ -260,8 +270,6 @@ class AgentGPT(Chain, BaseModel):
         )
     
 # Set up of your agent
-
-
 
 # Agent characteristics - can be modified
 config = dict(
