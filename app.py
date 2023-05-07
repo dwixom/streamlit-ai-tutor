@@ -3,13 +3,13 @@ import streamlit as st
 
 from ui.sidebar import generate_sidebar
 
-from apikey import apikey
+# from apikey import apikey
 from config2 import config
 
 print("------------------ RENDERING APP ------------------")
 
 # Set up environment variables
-os.environ['OPENAI_API_KEY'] = apikey
+# os.environ['OPENAI_API_KEY'] = apikey
 
 settings = config['personalization']
 
