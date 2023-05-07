@@ -157,17 +157,16 @@ elif ("user_input" in st.session_state and "history" in st.session_state):
     # Save session state
     # st.session_state.history = memory
     st.session_state.conversation = conversation
+    st.session_state.user_input = ""
   # else:
      # No human message
-  
 
-st.text_input("Enter your response to Larry:", key="user_input")
+st.text_input("Enter your response to Larry:", value="", key="user_input")
+st.button("Send", key="send")
 
-if st.session_state.history:
-  with st.expander('Conversation History', expanded=True): 
-        st.info(st.session_state.history.buffer)
-
-
+# if st.session_state.history:
+#   with st.expander('Conversation History', expanded=True): 
+#         st.info(st.session_state.history.buffer)
 
 # conversation = ConversationChain(
 #     llm=chat,
