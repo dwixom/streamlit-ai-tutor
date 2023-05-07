@@ -33,6 +33,7 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
     AIMessagePromptTemplate,
+    MessagesPlaceholder
 )
 from langchain.schema import (
     AIMessage,
@@ -43,6 +44,8 @@ from langchain.chains import ConversationChain
 from langchain.chains import SimpleSequentialChain
 from streamlit_chat import message
 from langchain.memory import ChatMessageHistory
+
+
 
 # History here: https://python.langchain.com/en/latest/modules/memory/getting_started.html
 
@@ -76,28 +79,60 @@ chat = ChatOpenAI(temperature=0.8)
 
 if ("history" or "intro") not in st.session_state:
   print("##### INITIALIZING #####")
-  st.session_state.history = ConversationBufferMemory(memory_key="history", return_messages=True)
-  memory = ConversationBufferMemory(return_messages=True)
-  intro = chat([SystemMessage(content="Introduce yourself to the user as Larry.ai, an ai-powered tutor, and ask what subject they'd like to learn about.")])
-  st.session_state.history.chat_memory.add_ai_message(intro.content)
-  st.session_state.intro = intro.content
-  st.write(intro.content)
-elif ("user_input" in st.session_state and "subject" not in st.session_state):
+
+  memory = ConversationBufferMemory(memory_key="history", return_messages=True)
+
+  intro_prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template("The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know."),
+    SystemMessagePromptTemplate.from_template("Introduce yourself to the user as Larry.ai, an ai-powered tutor, and ask what subject they'd like to learn about."),
+    MessagesPlaceholder(variable_name="history"),
+    HumanMessagePromptTemplate.from_template("{input}")
+  ])
+
+  conversation = ConversationChain(memory=memory, prompt=intro_prompt, llm=chat)
+  intro = conversation.predict(input="Hello")
+
+  # Display initial message
+  message(intro)
+
+  # Save session state
+  st.session_state.history = memory
+  st.session_state.conversation = conversation
+
+elif ("user_input" in st.session_state and "history" in st.session_state):
   print("##### CONTINUING #####")
 
-  # If message exists, build response
+  # Display chat history even if no input message
+  memory = st.session_state['history']
+  memory_buffer = memory.buffer
+  for i in range(len(memory_buffer)):
+    msg_obj = st.session_state['history'].buffer[i]
+    if msg_obj.type == "human":
+      message(msg_obj.content, is_user=True, key=str(i) + '_user')
+    else:
+      message(msg_obj.content, key=str(i))
+
+  # If input message exists, build response
   human_msg = st.session_state.user_input
   if human_msg:
-    st.write(human_msg)
+    # st.write(human_msg)
 
-    conversation = ConversationChain(
-      llm=chat,
-      memory=st.session_state.history,
-      verbose=True
-    )
+    response_prompt = ChatPromptTemplate.from_messages([
+      SystemMessagePromptTemplate.from_template("The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know."),
+      # SystemMessagePromptTemplate.from_template("Introduce yourself to the user as Larry.ai, an ai-powered tutor, and ask what subject they'd like to learn about."),
+      MessagesPlaceholder(variable_name="history"),
+      HumanMessagePromptTemplate.from_template("{input}")
+    ])
+
+    conversation = ConversationChain(memory=memory, prompt=response_prompt, llm=chat)
     ai_response = conversation.predict(input=human_msg)
-    
-    st.write(ai_response)
+
+    message(human_msg, is_user=True)
+    message(ai_response)
+
+    # Save session state
+    st.session_state.history = memory
+    st.session_state.conversation = conversation
 
 st.text_input("Enter your response to Larry:", key="user_input")
 
