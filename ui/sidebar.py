@@ -8,9 +8,9 @@ def sidebar_option(settings, title, index, key):
 
 def generate_sidebar(settings):
     st.sidebar.title("Customization Options")
-    sidebar_option(settings, "Depth Level", "depth_levels", "depth")
-    sidebar_option(settings, "Learning Style", "learning_styles", "learning_style")
-    sidebar_option(settings, "Communication Style", "communication_styles", "communication_style")
-    sidebar_option(settings, "Tone Style", "tone_styles", "tone_style")
-    sidebar_option(settings, "Reasoning Frameworks", "reasoning_frameworks", "reasoning_framework")
-    sidebar_option(settings, "Feedback Types", "feedback_types", "feedback_type")
+    sidebar_option(settings, "Depth Level", "depth", "depth")
+    sidebar_option(settings, "Learning Style", "learning_style", "learning_style")
+    sidebar_option(settings, "Communication Style", "communication_style", "communication_style")
+    sidebar_option(settings, "Tone Style", "tone_style", "tone_style")
+    sidebar_option(settings, "Reasoning Frameworks", "reasoning_framework", "reasoning_framework")
+    sidebar_option(settings, "Feedback Types", "feedback_type", "feedback_type")

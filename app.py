@@ -45,6 +45,9 @@ from langchain.chains import SimpleSequentialChain
 from streamlit_chat import message
 from langchain.memory import ChatMessageHistory
 
+def format_setting(index, key):
+  return st.session_state[index] + " -- " + settings[index]["options"].get(st.session_state[index])
+
 chat = ChatOpenAI(temperature=0.8, verbose=True)
 
 if ("history" or "intro") not in st.session_state:
@@ -91,22 +94,54 @@ elif ("user_input" in st.session_state and "history" in st.session_state):
 
     # Build response
     response_prompt = ChatPromptTemplate.from_messages([
-      SystemMessagePromptTemplate.from_template("The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know."),
-      SystemMessagePromptTemplate.from_template("""Self-Reminder that the students preferences are the following:
+      # SystemMessagePromptTemplate.from_template("The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know."),
+      SystemMessagePromptTemplate.from_template(
+      """Remember that you are Larry.ai, an AI-powered tutor.
+
+      You will walk the user through the process of learning about whatever subject(s) they choose.
+
+      These are the rules that you must follow as the AI tutor:
+
+      - The AI tutor must follow its specified learning style, communication style, tone style, reasoning framework, and depth
+      - The AI tutor must be able to create a lesson plan based on the student's preferences
+      - The AI tutor must be decisive, take the lead on the student's learning, and never be unsure of where to continue
+      - The AI tutor must always take into account its configuration as it represents the student's preferences
+      - The AI tutor is allowed to change its configuration if specified, and must inform the student about the changes
+      - The AI tutor is allowed to teach content outside of the configuration if requested or deemed necessary
+      - The AI tutor must be engaging and is allowed to use emojis if appropriate
+      - The AI tutor must create objective criteria for its own success and the student's success
+      - The AI tutor must output the success criteria for itself and the student after the lesson plan response only
+      - The AI tutor must obey the student's commands if specified
+      - The AI tutor must double-check its knowledge or answer step-by-step if the student requests it (e.g., if the student says the tutor is wrong)
+      - The AI tutor must respect the student's privacy and ensure a safe learning environment
+      
+      Self-Reminder that the students most recent preferences settings are the following:
         
-        Depth: {depth}
-        Learning Style: {learning_style}
-        Communication Style: {communication_style}
-        Tone Style: {tone_style}
-        Reasoning Framework: {reasoning_framework}
-        Feedback Type: {feedback_type}""", input_variables=["depth", "learning_style", "communication_style", "tone_style", "reasoning_framework", "feedback_type"]),
-      SystemMessagePromptTemplate.from_template("Below is the chat history so far. Respond as the AI based on the last message:"),
+      Depth: {depth}
+      Learning Style: {learning_style}
+      Communication Style: {communication_style}
+      Tone Style: {tone_style}
+      Reasoning Framework: {reasoning_framework}
+      Feedback Type: {feedback_type}
+
+      Below is the chat history so far. Respond as the AI based on the last message:
+
+      """, input_variables=["depth", "learning_style", "communication_style", "tone_style", "reasoning_framework", "feedback_type"]),
+      # SystemMessagePromptTemplate.from_template("Below is the chat history so far. Respond as the AI based on the last message:"),
       MessagesPlaceholder(variable_name="history"),
       HumanMessagePromptTemplate.from_template("{input}")
     ])
     conversation = LLMChain(memory=memory, prompt=response_prompt, llm=chat, verbose=True)
 
-    ai_response = conversation.run(input=human_msg, depth=st.session_state.depth, learning_style=st.session_state.learning_style, communication_style=st.session_state.communication_style, tone_style=st.session_state.tone_style, reasoning_framework=st.session_state.reasoning_framework, feedback_type=st.session_state.feedback_type)
+    ai_response = conversation.run(
+      input=human_msg, 
+      depth=format_setting("depth", st.session_state.depth), 
+      learning_style=format_setting("learning_style", st.session_state.learning_style), 
+      communication_style=format_setting("communication_style",st.session_state.communication_style), 
+      tone_style=format_setting("tone_style",st.session_state.tone_style), 
+      reasoning_framework=format_setting("reasoning_framework",st.session_state.reasoning_framework), 
+      feedback_type=format_setting("feedback_type",st.session_state.feedback_type),
+    )
 
     # Display response
     message(ai_response)

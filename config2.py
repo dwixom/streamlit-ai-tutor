@@ -12,7 +12,7 @@ config = {
     '10' : "self-eval: You self-evaluate yourself using the self-evaluation format.",
   },
   "personalization": {
-    "depth_levels": {
+    "depth": {
       "description": 'This is the depth of the content the student wants to learn. A low depth will cover the basics, and generalizations while a high depth will cover the specifics, details, unfamiliar, complex, and side cases. The lowest depth level is 1, and the highest is 10.',
       "options": {
         'Surface level': 'Covers topic basics with simple definitions and brief explanations, suitable for beginners or quick overviews.',
@@ -27,7 +27,7 @@ config = {
         "Cutting-edge research": "Discusses recent research and discoveries, offering deep understanding of current developments and future directions.",
       },
     },
-    "learning_styles": {
+    "learning_style": {
       "description": 'This is the learning style of the student. A sensing style will be more concrete and practical, while an intuitive style will be more conceptual and innovative.',
       "options": {
         "Sensing": "Concrete, practical, oriented towards facts and procedures.",
@@ -42,7 +42,7 @@ config = {
         "Global": "Holistic, system thinkers, learn in large leaps",
       }
     },
-    "communication_styles": {
+    "communication_style": {
       "description": 'This is the style of communcation that the tutor will provide. A formal style will be more structured and polished, while a layman style will be more relatable and engaging.',
       "options": {
         "Stochastic": "Incorporates randomness or variability, generating slight variations in responses for a dynamic, less repetitive conversation.",
@@ -54,7 +54,7 @@ config = {
         "Humorous": "Incorporates wit, jokes, and light-hearted elements for enjoyable, engaging, and memorable content in a relaxed atmosphere."
       }
     },
-    "tone_styles": {
+    "tone_style": {
       "description": 'This is the tone of the conversation. A debate style will be more assertive and competitive, while an encouraging style will be more supportive and empathetic.',
       "options": {
         "Debate": "Assertive and competitive, challenges users to think critically and defend their position. Suitable for confident learners.",
@@ -64,7 +64,7 @@ config = {
         "Friendly": "Warm and conversational, establishes connection using friendly language. Best for extroverted learners preferring personal interactions.",
       }
     },
-    "reasoning_frameworks": {
+    "reasoning_framework": {
       "description": 'This is the reasoning framework that the tutor will use. A deductive framework will draw conclusions from general principles, while an inductive framework will form general conclusions from specific observations.',
       "options": {
         "Deductive": "Draws conclusions from general principles, promoting critical thinking and logical problem-solving skills.",
@@ -74,7 +74,7 @@ config = {
         "Causal": "Identifies cause-and-effect relationships, developing critical thinking and understanding of complex systems."
       }
     },
-    "feedback_types": {
+    "feedback_type": {
       "description": 'This is the type of feedback that the tutor will provide. An immediate feedback will provide instant feedback after each response, while a delayed feedback will delay feedback to encourage reflection and self-assessment.',
       "options": {
         "Immediate": "Provides instant feedback after each response or interaction, allowing for quick corrections and reinforcement.",
