@@ -71,7 +71,7 @@ if ("history" or "intro") not in st.session_state:
   # Save session state
   st.session_state.history = memory
 
-elif ("user_input" in st.session_state and "history" in st.session_state):
+elif (st.session_state.user_input is not None and "history" in st.session_state):
   print("##### CONTINUING #####")
 
   # Display chat history even if no input message
@@ -152,9 +152,11 @@ elif ("user_input" in st.session_state and "history" in st.session_state):
   # else:
      # No human message
 
-st.text_input("Enter your response to Larry:", value="", key="user_input")
-st.button("Send", key="send")
+# With the following:
+with st.form("send_message_form"):
+    st.text_input("Enter your response to Larry:", value=None, key="user_input")
+    submit_button = st.form_submit_button("Send")
 
-if st.session_state.history:
-  with st.expander('Conversation History', expanded=True): 
-        st.info(st.session_state.history.buffer)
+# if st.session_state.history:
+#   with st.expander('Conversation History', expanded=True): 
+#         st.info(st.session_state.history.buffer)
